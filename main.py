@@ -1,21 +1,20 @@
 import turtle
 from random import randint
-import re
-
 import classes
 
 
 def initBoard(size):
     board = [[] for i in range(size)]
-    for row in range(size):
-        for col in range(size):
-            board[row].append(0)
+    for rows in range(size):
+        for cols in range(size):
+            board[rows].append(0)
     return board
 
 
 # TODO: regulate board size scale to current screen size
 def drawBoard(t, board):
     # setup
+    # scaling equation is currently arbitrary, tie to screen size
     scale = -20 * board.__len__() + 300
     t.tracer(0)
     t.pensize(4)
@@ -26,8 +25,8 @@ def drawBoard(t, board):
     t.pendown()
 
     # does this really need to be N^3
-    for row in board:
-        for tile in row:
+    for line in board:
+        for tile in line:
             for i in range(4):
                 t.forward(scale)
                 t.left(90)
@@ -45,26 +44,29 @@ def drawBoard(t, board):
 # TODO: handle strings that aren't num, num
 def terminalPlace(player):
     # First input
+    x = y = -1
     i = input()
     if i == "end" or i == "quit" or i == "stop":
         return True
-    x, y = i.split(",")
-    x = int(x)
-    y = int(y)
-
-    # Conditions for valid placement: if invalid, must enter input again
-    while not (boardSize >= x >= 0 == logicBoard[x - 1][y - 1] and boardSize >= y >= 0):
-        print("Invalid placement, enter another coordinate:")
-        i = input()
-        if i == "end" or i == "quit" or i == "stop":
-            return True
+    elif 3 <= i.__len__() <= 6:
         x, y = i.split(",")
         x = int(x)
         y = int(y)
 
-    # player.place(logicBoard, x, y)
-    logicBoard[x - 1][y - 1] = player
-    print(logicBoard)
+    # Conditions for valid placement: if invalid, must enter input again
+    while not (boardSize >= x >= 0 == logicBoard[x - 1][y - 1] and boardSize >= y >= 0):
+        print("Invalid placement, enter another coordinate:")
+        x = y = -1
+        i = input()
+        if i == "end" or i == "quit" or i == "stop":
+            return True
+        elif 3 <= i.__len__() <= 6:
+            x, y = i.split(",")
+            x = int(x)
+            y = int(y)
+
+    player.place(logicBoard, x, y)
+    # logicBoard[x - 1][y - 1] = player
     return False
 
 
@@ -77,9 +79,9 @@ if __name__ == '__main__':
 
     # Selecting game mode
     gameMode = int(input("Press 1 to play against the computer, or 2 to play against another person locally: "))
-    first = randint(0, 1)
     while gameMode < 1 or gameMode > 2:
         gameMode = int(input("Invalid game mode, enter a valid option: "))
+    first = randint(0, 1)
 
     # Computer
     if gameMode == 1:
@@ -95,45 +97,85 @@ if __name__ == '__main__':
 
     # Gameplay loop
     gameOver = False
+    plays = 0
 
-    # TODO: win condition
     while not gameOver:
-        if first == 0:
+        countForX = countForO = 0
+
+        # # Computer
+        # if first == 0 and gameMode == 1:
+        #     first = not first
+        #
+        # elif first == 1 and gameMode == 1:
+        #     first = not first
+
+        # Local Play
+        if first == 0 and gameMode == 2:
+            plays += 1
             # first player X: wherever click is, place an X on the board
             print(f"X's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             gameOver = terminalPlace(classes.X())
 
-            # if piece in first row, check below: if in first column of other rows, check right
+            # if piece in first row, check below
+            for col in range(boardSize):
+                if isinstance(logicBoard[0][col], classes.X):
+                    countForX = 1
+                    # Checking below for consecutive pieces
+                    for row in range(boardSize - 1):
+                        if isinstance(logicBoard[row + 1][col], classes.X):
+                            countForX += 1
+
+            # if in first column of other rows, check right
             for row in range(boardSize):
-                for col in range(boardSize):
-                    print(row, col, type(logicBoard[row][col]), type(classes.X()))
-                    # First row: check if other pieces are below
-                    if logicBoard[row][col] == classes.X() and row == 0:
-                        print("Top", end='')
-                    # First col: check if pieces are right
-                    elif logicBoard[row][col] == classes.X() and col == 0:
-                        print("Left", end='')
+                if isinstance(logicBoard[row][0], classes.X):
+                    countForX = 1
+                    # Checking right for consecutive pieces
+                    for col in range(boardSize - 1):
+                        if isinstance(logicBoard[row][col + 1], classes.X):
+                            countForX += 1
 
             first = not first
 
-        else:
+        elif first == 1 and gameMode == 2:
+            plays += 1
             # second player O: wherever click place O on board
             print(f"O's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             gameOver = terminalPlace(classes.O())
 
-            # if piece in first row, check below: if in first column of other rows, check right
+            # if piece in first row, check below
+            for col in range(boardSize):
+                if isinstance(logicBoard[0][col], classes.O):
+                    countForO = 1
+                    # Checking below for consecutive pieces
+                    for row in range(boardSize - 1):
+                        if isinstance(logicBoard[row + 1][col], classes.O):
+                            countForO += 1
+
+            # if in first column of other rows, check right
             for row in range(boardSize):
-                for col in range(boardSize):
-                    print(row, col, type(logicBoard[row][col]), type(classes.O()))
-                    # First row: check if other pieces are below
-                    if logicBoard[row][col] == classes.O() and row == 0:
-                        print("Top", end='')
-                    # First col: check if pieces are right
-                    elif logicBoard[row][col] == classes.O() and col == 0:
-                        print("Left", end='')
+                if isinstance(logicBoard[row][0], classes.O):
+                    countForO = 1
+                    # Checking right for consecutive pieces
+                    for col in range(boardSize - 1):
+                        if isinstance(logicBoard[row][col + 1], classes.O):
+                            countForO += 1
 
             first = not first
 
+        # Terminal board representation
+        for row in range(boardSize):
+            print(logicBoard[row])
+
+        # Win condition
+        if countForX == boardSize:
+            gameOver = True
+            print("Game Over! X wins!")
+        elif countForO == boardSize:
+            gameOver = True
+            print("Game Over! O wins!")
+        elif plays == boardSize * boardSize:
+            gameOver = True
+            print("It's a draw!")
+
     # TODO: make quitting actually shut everything down
-    print("Game over!")
     turtle.done()
