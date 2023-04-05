@@ -4,7 +4,7 @@ class X:
         self
 
     def place(self, board, x, y):
-        board[x - 1][y - 1] = X()
+        board[x - 1][y - 1] = 'X'
 
 
 class O:
@@ -13,4 +13,4 @@ class O:
         self
 
     def place(self, board, x, y):
-        board[x - 1][y - 1] = O()
+        board[x - 1][y - 1] = 'O'

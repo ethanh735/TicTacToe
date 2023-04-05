@@ -1,5 +1,6 @@
 import turtle
 from random import randint
+from os import system, name
 import classes
 
 
@@ -8,7 +9,7 @@ def initBoard(size):
     board = [[] for i in range(size)]
     for rows in range(size):
         for cols in range(size):
-            board[rows].append(0)
+            board[rows].append('-')
     return board
 
 
@@ -50,18 +51,26 @@ def drawBoard(t, bSize, sSize):
 
 def displayFormat():
     # 1 is graphic, 2 is text
-    formatMode = int(input("Press 1 to play on a graphical screen, or 2 to play a text-based game: "))
-    while formatMode < 1 or formatMode > 2:
-        formatMode = int(input("Invalid game format, enter a valid option: "))
-    return formatMode
+    print("Press 1 to play on a graphical screen, or 2 to play a text-based game: ", end='')
+    while True:
+        df = input()
+        if df == '1' or df == '2':
+            break
+        else:
+            print("Invalid input.\nPress 1 to play on a graphical screen, or 2 to play a text-based game: ", end='')
+    return int(df)
 
 
 def gameMode():
     # 1 is computer, 2 is local vs
-    gameMode = int(input("Press 1 to play against the computer, or 2 to play against another person locally: "))
-    while gameMode != 2:
-        gameMode = int(input("Invalid game mode, enter a valid option: "))
-    return gameMode
+    print("Press 1 to play against the computer, or 2 to play against another person locally: ", end='')
+    while True:
+        gm = input()
+        if gm == '2':
+            break
+        else:
+            print("Invalid input.\nPress 1 to play against the computer, or 2 to play against another person locally:", end='')
+    return int(gm)
 
 
 # TODO: handle strings that aren't num, num
@@ -80,12 +89,37 @@ def terminalPlace(player):
             y = int(y)
 
         # Valid placement conditions
-        if logicBoard[x - 1][y - 1] == 0 <= x <= boardSize and 0 <= y <= boardSize:
+        if logicBoard[x - 1][y - 1] == '-' and 0 <= x <= boardSize and 0 <= y <= boardSize:
             break
         else:
             print("Invalid placement, enter another coordinate:")
 
     player.place(logicBoard, x, y)
+    return False
+
+
+# TODO: correct terminal clearing
+def terminalRefresh():
+    # terminal clearing based on OS type
+    if name == 'nt':
+        clear = system('cls')
+    elif name == 'posix':
+        clear = system('clear')
+    for row in range(boardSize):
+        print(logicBoard[row])
+
+
+def terminalWin(countX, countO, plays):
+    # Win condition
+    if countX == boardSize:
+        print("Game Over! X wins!")
+        return True
+    elif countO == boardSize:
+        print("Game Over! O wins!")
+        return True
+    elif plays == boardSize * boardSize:
+        print("It's a draw!")
+        return True
     return False
 
 
@@ -159,7 +193,6 @@ def computerTerminalGame(over, first):
     #     over = terminalWin(countX, countO, plays)
 
 
-# TODO: make terminal piece formatting look nice
 # TODO: improve win condition checking
 def pvpTerminalGame(over, first):
     plays = 0
@@ -168,67 +201,54 @@ def pvpTerminalGame(over, first):
 
         if first == 0:
             plays += 1
-            # first player X: wherever click is, place an X on the board
+            # first player X: wherever coordinates are, place an X on the board
             print(f"X's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             over = terminalPlace(classes.X())
 
+            # check 1,1 for diagonal down
+
             # if piece in first row, check below
             for col in range(boardSize):
-                if isinstance(logicBoard[0][col], classes.X):
+                if logicBoard[0][col] == 'X':
                     for row in range(boardSize - 1):
-                        if isinstance(logicBoard[row + 1][col], classes.X):
+                        if logicBoard[row + 1][col] == 'X':
                             countX += 1
 
             # if in first column of other rows, check right
             for row in range(boardSize):
-                if isinstance(logicBoard[row][0], classes.X):
+                if logicBoard[row][0] == 'X':
                     for col in range(boardSize - 1):
-                        if isinstance(logicBoard[row][col + 1], classes.X):
+                        if logicBoard[row][col + 1] == 'X':
                             countX += 1
-            first = not first
 
-            for row in range(boardSize):
-                print(logicBoard[row])
+            # check row,1 for diagonal up
+
+            first = not first
+            terminalRefresh()
             over = terminalWin(countX, countO, plays)
 
         elif first == 1:
             plays += 1
-            # second player O: wherever click place O on board
+            # second player O: wherever coordinates are, place O on board
             print(f"O's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             over = terminalPlace(classes.O())
 
             # if piece in first row, check below
             for col in range(boardSize):
-                if isinstance(logicBoard[0][col], classes.O):
+                if logicBoard[0][col] == 'O':
                     for row in range(boardSize - 1):
-                        if isinstance(logicBoard[row + 1][col], classes.O):
+                        if logicBoard[row + 1][col] == 'O':
                             countO += 1
 
             # if in first column of other rows, check right
             for row in range(boardSize):
-                if isinstance(logicBoard[row][0], classes.O):
+                if logicBoard[row][0] == 'O':
                     for col in range(boardSize - 1):
-                        if isinstance(logicBoard[row][col + 1], classes.O):
+                        if logicBoard[row][col + 1] == 'O':
                             countO += 1
             first = not first
-
-            for row in range(boardSize):
-                print(logicBoard[row])
+            terminalRefresh()
             over = terminalWin(countX, countO, plays)
-
-
-def terminalWin(countX, countO, plays):
-    # Win condition
-    if countX == boardSize:
-        print("Game Over! X wins!")
-        return True
-    elif countO == boardSize:
-        print("Game Over! O wins!")
-        return True
-    elif plays == boardSize * boardSize:
-        print("It's a draw!")
-        return True
-    return False
 
 
 if __name__ == '__main__':
@@ -248,6 +268,7 @@ if __name__ == '__main__':
     # TODO: make game wait for a click to happen
     # PvP game loop, turtle
     if formatting == 1:
+        terminalRefresh()
         turtle.screensize(600, 450)
         drawBoard(turtle, boardSize, turtle.screensize())
 
@@ -262,6 +283,7 @@ if __name__ == '__main__':
             pvpGraphicalGame(gameOver, whoGoesFirst)
 
     elif formatting == 2:
+        terminalRefresh()
         # Computer game loop, terminal
         if mode == 1:
             print(f"Playing against the computer.\nPlayer {whoGoesFirst + 1} goes first!")
