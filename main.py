@@ -1,6 +1,8 @@
+import sys
 import turtle
-from random import randint
 from os import system, name
+from random import randint
+
 import classes
 
 
@@ -49,7 +51,23 @@ def drawBoard(t, bSize, sSize):
         t.pendown()
 
 
-def displayFormat():
+def getBoardSize():
+    # can be any positive int between 1-100
+    print("Enter Board Size: ", end='')
+    while True:
+        bs = input()
+        try:
+            bs = int(bs)
+            if bs <= 0 or bs > 100:
+                raise ValueError
+        except ValueError:
+            print("Invalid input. Enter Board Size: ", end='')
+        else:
+            break
+    return bs
+
+
+def getDisplayFormat():
     # 1 is graphic, 2 is text
     print("Press 1 to play on a graphical screen, or 2 to play a text-based game: ", end='')
     while True:
@@ -61,7 +79,7 @@ def displayFormat():
     return int(df)
 
 
-def gameMode():
+def getGameMode():
     # 1 is computer, 2 is local vs
     print("Press 1 to play against the computer, or 2 to play against another person locally: ", end='')
     while True:
@@ -73,32 +91,34 @@ def gameMode():
     return int(gm)
 
 
-# TODO: handle strings that aren't num, num
 def terminalPlace(player):
     # Emulates a do-while loop
     while True:
-        x = y = -1
         i = input()
 
         # Input handling
         if i == "end" or i == "quit" or i == "stop" or i == "exit" or i == "q" or i == "s" or i == "e":
             return True
-        elif 3 <= i.__len__() <= 7:
-            x, y = i.split(",")
-            x = int(x)
-            y = int(y)
-
-        # Valid placement conditions
-        if logicBoard[x - 1][y - 1] == '-' and 0 <= x <= boardSize and 0 <= y <= boardSize:
-            break
         else:
-            print("Invalid placement, enter another coordinate:")
+            try:
+                x, y = i.split(",")
+                assert i.__len__() >= 3 or i.__len__() <= 7
+            except ValueError or AssertionError:
+                print(f"Invalid format, enter a valid coordinate as num,num:")
+                continue
+            else:
+                x = int(x)
+                y = int(y)
+
+                # Valid placement conditions
+                if 0 <= x <= boardSize and 0 <= y <= boardSize and logicBoard[x - 1][y - 1] == '-':
+                    break
+                print(f"Invalid placement, enter another coordinate between 1,1 and {boardSize},{boardSize}:")
 
     player.place(logicBoard, x, y)
     return False
 
 
-# TODO: correct terminal clearing
 def terminalRefresh():
     # terminal clearing based on OS type
     if name == 'nt':
@@ -109,6 +129,7 @@ def terminalRefresh():
         print(logicBoard[row])
 
 
+# TODO: dissolve so that over bool is the only thing checked (no game logic checking in loop)
 def terminalWin(countX, countO, plays):
     # Win condition
     if countX == boardSize:
@@ -201,72 +222,141 @@ def pvpTerminalGame(over, first):
 
         if first == 0:
             plays += 1
+            if plays == boardSize ** 2:
+                print("It's a draw!")
+                over = True
             # first player X: wherever coordinates are, place an X on the board
             print(f"X's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
-            over = terminalPlace(classes.X())
+            if terminalPlace(classes.X()):
+                break
 
-            # check 1,1 for diagonal down
+            # \ diagonal check
+            if logicBoard[0][0] == 'X':
+                for j in range(1, boardSize - 1):
+                    if logicBoard[j][j] == 'X':
+                        countX += 1
+            if countX >= boardSize:
+                print("Game Over! X wins!")
+                over = True
+            else:
+                countX = 1
 
-            # if piece in first row, check below
-            for col in range(boardSize):
-                if logicBoard[0][col] == 'X':
-                    for row in range(boardSize - 1):
-                        if logicBoard[row + 1][col] == 'X':
+            # / diagonal check
+            if logicBoard[0][boardSize - 1] == 'X':
+                col = boardSize - 2
+                for j in range(1, boardSize - 1):
+                    if logicBoard[j][col] == 'X':
+                        countX += 1
+                    col -= 1
+            if countX >= boardSize:
+                print("Game Over! X wins!")
+                over = True
+            else:
+                countX = 1
+
+            for tile in range(boardSize - 1):
+                # first row check for vertical win
+                if logicBoard[0][tile] == 'X':
+                    for j in range(boardSize - 1):
+                        if logicBoard[j][tile] == 'X':
                             countX += 1
-
-            # if in first column of other rows, check right
-            for row in range(boardSize):
-                if logicBoard[row][0] == 'X':
-                    for col in range(boardSize - 1):
-                        if logicBoard[row][col + 1] == 'X':
+                if countX >= boardSize:
+                    print("Game Over! X wins!")
+                    over = True
+                else:
+                    countX = 1
+                    
+                # first column check for horizontal win
+                if logicBoard[tile][0] == 'X':
+                    for j in range(boardSize - 1):
+                        if logicBoard[tile][j] == 'X':
                             countX += 1
-
-            # check row,1 for diagonal up
-
+                if countX >= boardSize:
+                    print("Game Over! X wins!")
+                    over = True
+                else:
+                    countX = 1
+                
             first = not first
             terminalRefresh()
-            over = terminalWin(countX, countO, plays)
 
         elif first == 1:
             plays += 1
+            if plays == boardSize ** 2:
+                print("It's a draw!")
+                over = True
             # second player O: wherever coordinates are, place O on board
             print(f"O's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
-            over = terminalPlace(classes.O())
+            if terminalPlace(classes.O()):
+                break
 
-            # if piece in first row, check below
-            for col in range(boardSize):
-                if logicBoard[0][col] == 'O':
-                    for row in range(boardSize - 1):
-                        if logicBoard[row + 1][col] == 'O':
-                            countO += 1
+            # \ diagonal check
+            if logicBoard[0][0] == 'O':
+                for j in range(1, boardSize - 1):
+                    if logicBoard[j][j] == 'O':
+                        countO += 1
+            if countO >= boardSize:
+                print("Game Over! O wins!")
+                over = True
+            else:
+                countO = 1
+                    
+            # / diagonal check
+            if logicBoard[0][boardSize - 1] == 'O':
+                col = boardSize - 2
+                for j in range(1, boardSize - 1):
+                    if logicBoard[j][col] == 'O':
+                        countO += 1
+                    col -= 1
+            if countO >= boardSize:
+                print("Game Over! O wins!")
+                over = True
+            else:
+                countO = 1
 
-            # if in first column of other rows, check right
-            for row in range(boardSize):
-                if logicBoard[row][0] == 'O':
-                    for col in range(boardSize - 1):
-                        if logicBoard[row][col + 1] == 'O':
+            for tile in range(boardSize - 1):
+                # first row check for vertical win
+                if logicBoard[0][tile] == 'O':
+                    for j in range(boardSize - 1):
+                        if logicBoard[j][tile] == 'O':
                             countO += 1
+                if countO >= boardSize:
+                    print("Game Over! O wins!")
+                    over = True
+                else:
+                    countO = 1
+                    
+                # first column check for horizontal win
+                if logicBoard[tile][0] == 'O':
+                    for j in range(boardSize - 1):
+                        if logicBoard[tile][j] == 'O':
+                            countO += 1
+                if countO >= boardSize:
+                    print("Game Over! O wins!")
+                    over = True
+                else:
+                    countO = 1
+                                
             first = not first
             terminalRefresh()
-            over = terminalWin(countX, countO, plays)
 
 
 if __name__ == '__main__':
     # setup
     whoGoesFirst = randint(0, 1)
     gameOver = False
-    boardSize = 3
+
+    boardSize = getBoardSize()
     logicBoard = initBoard(boardSize)
 
     print("Game Formatting Selection:")
-    formatting = displayFormat()
+    formatting = getDisplayFormat()
 
     print("Game Mode Selection:")
-    mode = gameMode()
+    mode = getGameMode()
 
     # Gameplay loops
     # TODO: make game wait for a click to happen
-    # PvP game loop, turtle
     if formatting == 1:
         terminalRefresh()
         turtle.screensize(600, 450)
