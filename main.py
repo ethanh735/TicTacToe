@@ -1,4 +1,3 @@
-import sys
 import turtle
 from os import system, name
 from random import randint
@@ -8,7 +7,7 @@ import classes
 
 def initBoard(size):
     # List of lists
-    board = [[] for i in range(size)]
+    board = [[] for _ in range(size)]
     for rows in range(size):
         for cols in range(size):
             board[rows].append('-')
@@ -122,9 +121,9 @@ def terminalPlace(player):
 def terminalRefresh():
     # terminal clearing based on OS type
     if name == 'nt':
-        clear = system('cls')
+        system('cls')
     elif name == 'posix':
-        clear = system('clear')
+        system('clear')
     for row in range(boardSize):
         print(logicBoard[row])
 
@@ -144,19 +143,19 @@ def terminalWin(countX, countO, plays):
     return False
 
 
-def graphicalPlace(x, y, bSize, sSize):
-    return
-    # # Emulates a do-while loop
-    # while True:
-    #     print("Which tile is the click in?")
-    #     break
-    #     # Figure out which spot the click coordinates are in
-    #     # instance - 1 / boardSize:
-    #     # Board of 4: between 1/6 and 2/6 screenSize, 2/6 and 3/6 screenSize, 3/6 and 4/6 screenSize, 4/6 and 5/6 screenSize
+# def graphicalPlace(x, y, bSize, sSize):
+#     return
+#     # # Emulates a do-while loop
+#     # while True:
+#     #     print("Which tile is the click in?")
+#     #     break
+#     #     # Figure out which spot the click coordinates are in
+#     #     # instance - 1 / boardSize:
+#     #     # Board of 4: between 1/6 and 2/6 screenSize, 2/6 and 3/6 screenSize, 3/6 and 4/6 screenSize, 4/6 and 5/6 screenSize
 
 
-def computerGraphicalGame(over, first):
-    return
+# def computerGraphicalGame(over, first):
+#     return
 
 
 def pvpGraphicalGame(over, first):
@@ -191,27 +190,27 @@ def pvpGraphicalGame(over, first):
             over = terminalWin(countX, countO, plays)
 
 
-def computerTerminalGame(over, first):
-    return
-    # plays = 0
-    #
-    # if first == 0:
-    #     print("You go first!")
-    # else:
-    #     print("The computer goes first!")
-    # while not over:
-    #     countX = countO = 0
-    #     if first == 0:
-    #         first = not first
-    #
-    #     elif first == 1:
-    #         first = not first
-
-    #     # Terminal board representation
-    #     for row in range(boardSize):
-    #         print(logicBoard[row])
-    #
-    #     over = terminalWin(countX, countO, plays)
+# def computerTerminalGame(over, first):
+#     return
+#     # plays = 0
+#     #
+#     # if first == 0:
+#     #     print("You go first!")
+#     # else:
+#     #     print("The computer goes first!")
+#     # while not over:
+#     #     countX = countO = 0
+#     #     if first == 0:
+#     #         first = not first
+#     #
+#     #     elif first == 1:
+#     #         first = not first
+#
+#     #     # Terminal board representation
+#     #     for row in range(boardSize):
+#     #         print(logicBoard[row])
+#     #
+#     #     over = terminalWin(countX, countO, plays)
 
 
 # TODO: improve win condition checking
@@ -365,7 +364,7 @@ if __name__ == '__main__':
         # Computer game loop, turtle
         if mode == 1:
             print(f"Playing against the computer.\nPlayer {whoGoesFirst + 1} goes first!")
-            computerGraphicalGame(gameOver, whoGoesFirst)
+            # computerGraphicalGame(gameOver, whoGoesFirst)
 
         # PvP game loop, turtle
         elif mode == 2:
@@ -377,7 +376,7 @@ if __name__ == '__main__':
         # Computer game loop, terminal
         if mode == 1:
             print(f"Playing against the computer.\nPlayer {whoGoesFirst + 1} goes first!")
-            computerTerminalGame(gameOver, whoGoesFirst)
+            # computerTerminalGame(gameOver, whoGoesFirst)
 
         # PvP game loop, terminal
         elif mode == 2:
