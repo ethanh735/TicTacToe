@@ -101,15 +101,13 @@ def terminalPlace(player):
         else:
             try:
                 x, y = i.split(",")
-                assert i.__len__() >= 3 or i.__len__() <= 7
+                x = int(x)
+                y = int(y)
             except ValueError or AssertionError:
                 print(f"Invalid format, enter a valid coordinate as num,num:")
                 continue
+            # Valid placement conditions
             else:
-                x = int(x)
-                y = int(y)
-
-                # Valid placement conditions
                 if 0 <= x <= boardSize and 0 <= y <= boardSize and logicBoard[x - 1][y - 1] == '-':
                     break
                 print(f"Invalid placement, enter another coordinate between 1,1 and {boardSize},{boardSize}:")
