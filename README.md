@@ -1,9 +1,11 @@
 # TicTacToe
 
 **Overview**
+
 A Tic Tac Toe program that allows for in-person play on the terminal, with plans to implement AI opponents and a GUI with the Turtle library.
 
 **Project Nature**
+
 This project relies heavily on handling user input effectively, structuring logical branches effectively, and understanding possible points of intersection between object-oriented and functional programming.
 
 This project in particular marks what is essentially my first effort at coming up with a sizeable program from scratch. Thus, there have been several issues with the organization, scoping, implementation, etc. of this project. The point is not necessarily to fix all of these: it is instead to learn from them so that future projects are done better.

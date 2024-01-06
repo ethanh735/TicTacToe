@@ -217,57 +217,67 @@ def pvpTerminalGame(over, first):
     while not over:
         countX = countO = 1
 
-        if first == 0:
+        # Tie Game
+        if plays == boardSize ** 2:
+            # doesn't print
+            print("It's a draw!")
+            over = True
+
+        # X plays
+        elif first == 0:
             plays += 1
-            if plays == boardSize ** 2:
-                print("It's a draw!")
-                over = True
+
             # first player X: wherever coordinates are, place an X on the board
             print(f"X's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             if terminalPlace(classes.X()):
                 break
 
-            # \ diagonal check
+            # Win Condition Checking:
+            # \ diagonal check: if top left corner is piece then check
             if logicBoard[0][0] == 'X':
-                for j in range(1, boardSize - 1):
-                    if logicBoard[j][j] == 'X':
+                for row_col in range(1, boardSize):
+                    if logicBoard[row_col][row_col] == 'X':
                         countX += 1
+            # determine if win has occurred
             if countX >= boardSize:
                 print("Game Over! X wins!")
                 over = True
             else:
                 countX = 1
 
-            # / diagonal check
+            # / diagonal check: if top right corner is piece then check
             if logicBoard[0][boardSize - 1] == 'X':
                 col = boardSize - 2
-                for j in range(1, boardSize - 1):
-                    if logicBoard[j][col] == 'X':
+                for row in range(1, boardSize):
+                    if logicBoard[row][col] == 'X':
                         countX += 1
                     col -= 1
+            # determine if win has occurred
             if countX >= boardSize:
                 print("Game Over! X wins!")
                 over = True
             else:
                 countX = 1
 
-            for tile in range(boardSize - 1):
-                # first row check for vertical win
-                if logicBoard[0][tile] == 'X':
-                    for j in range(boardSize - 1):
-                        if logicBoard[j][tile] == 'X':
+            for start in range(boardSize):
+                # - vertical check: if top row is piece then check
+                if logicBoard[0][start] == 'X':
+                    for row in range(1, boardSize):
+                        if logicBoard[row][start] == 'X':
                             countX += 1
+                # determine if win has occurred
                 if countX >= boardSize:
                     print("Game Over! X wins!")
                     over = True
                 else:
                     countX = 1
-                    
-                # first column check for horizontal win
-                if logicBoard[tile][0] == 'X':
-                    for j in range(boardSize - 1):
-                        if logicBoard[tile][j] == 'X':
+
+                # | horizontal check: if start startumn is piece then check
+                if logicBoard[start][0] == 'X':
+                    for col in range(1, boardSize):
+                        if logicBoard[start][col] == 'X':
                             countX += 1
+                # determine if win has occurred
                 if countX >= boardSize:
                     print("Game Over! X wins!")
                     over = True
@@ -277,57 +287,61 @@ def pvpTerminalGame(over, first):
             first = not first
             terminalRefresh()
 
+        # O plays
         elif first == 1:
             plays += 1
-            if plays == boardSize ** 2:
-                print("It's a draw!")
-                over = True
+
             # second player O: wherever coordinates are, place O on board
             print(f"O's turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
             if terminalPlace(classes.O()):
                 break
 
-            # \ diagonal check
+            # Win Condition Checking:
+            # \ diagonal check: if top left corner is piece then check
             if logicBoard[0][0] == 'O':
-                for j in range(1, boardSize - 1):
-                    if logicBoard[j][j] == 'O':
+                for row_col in range(1, boardSize):
+                    if logicBoard[row_col][row_col] == 'O':
                         countO += 1
+            # determine if win has occurred
             if countO >= boardSize:
                 print("Game Over! O wins!")
                 over = True
             else:
                 countO = 1
                     
-            # / diagonal check
+            # / diagonal check: if top right corner is piece then check
             if logicBoard[0][boardSize - 1] == 'O':
                 col = boardSize - 2
-                for j in range(1, boardSize - 1):
-                    if logicBoard[j][col] == 'O':
+                for row in range(1, boardSize):
+                    if logicBoard[row][col] == 'O':
                         countO += 1
                     col -= 1
+            # determine if win has occurred
             if countO >= boardSize:
                 print("Game Over! O wins!")
                 over = True
             else:
                 countO = 1
 
-            for tile in range(boardSize - 1):
-                # first row check for vertical win
-                if logicBoard[0][tile] == 'O':
-                    for j in range(boardSize - 1):
-                        if logicBoard[j][tile] == 'O':
+            for start in range(boardSize):
+                # - vertical check: if top row is piece then check
+                if logicBoard[0][start] == 'O':
+                    for row in range(1, boardSize):
+                        if logicBoard[row][start] == 'O':
                             countO += 1
+                # determine if win has occurred
                 if countO >= boardSize:
                     print("Game Over! O wins!")
                     over = True
                 else:
                     countO = 1
                     
-                # first column check for horizontal win
-                if logicBoard[tile][0] == 'O':
-                    for j in range(boardSize - 1):
-                        if logicBoard[tile][j] == 'O':
+                # | horizontal check: if first column is piece then check
+                if logicBoard[start][0] == 'O':
+                    for col in range(1, boardSize):
+                        if logicBoard[start][col] == 'O':
                             countO += 1
+                # determine if win has occurred
                 if countO >= boardSize:
                     print("Game Over! O wins!")
                     over = True
