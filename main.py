@@ -1,6 +1,5 @@
 import turtle
 from os import system, name
-from random import randint
 
 import classes
 
@@ -108,11 +107,11 @@ def terminalPlace(player):
                 continue
             # Valid placement conditions
             else:
-                if 0 <= x <= boardSize and 0 <= y <= boardSize and logicBoard[x - 1][y - 1] == '-':
+                if 0 < x <= game.boardSize and 0 < y <= game.boardSize and game.logicBoard[x - 1][y - 1] == '-':
                     break
-                print(f"Invalid placement, enter another coordinate between 1,1 and {boardSize},{boardSize}:")
+                print(f"Invalid placement, enter another coordinate between 1,1 and {game.boardSize},{game.boardSize}:")
 
-    player.place(logicBoard, x, y)
+    player.place(game.logicBoard, x, y)
     return False
 
 
@@ -123,8 +122,8 @@ def terminalRefresh():
     elif name == 'posix':
         system('clear')
     # proper formatting for each row
-    for row in range(boardSize):
-        print(logicBoard[row])
+    for row in range(game.boardSize):
+        print(game.logicBoard[row])
 
 
 # def graphicalPlace(x, y, bSize, sSize):
@@ -133,7 +132,7 @@ def terminalRefresh():
 #     #     print("Which tile is the click in?")
 #     #     break
 #     #     # Figure out which spot the click coordinates are in
-#     #     # instance - 1 / boardSize:
+#     #     # instance - 1 / game.boardSize:
 #     #     # Board of 4: between 1/6 and 2/6 screenSize, 2/6 and 3/6 screenSize, 3/6 and 4/6 screenSize, 4/6 and 5/6 screenSize (if centered by equidistant margins)
 
 
@@ -155,7 +154,7 @@ def pvpGraphicalGame(over, first):
             # Wait for a click to happen
             while turtx == turtle.xcor() and turty == turtle.ycor():
                 turtle.onclick(turtle.goto)
-                # graphicalPlace(turtle.xcor(), turtle.ycor(), boardSize, turtle.screensize())
+                # graphicalPlace(turtle.xcor(), turtle.ycor(), game.boardSize, turtle.screensize())
                 print(turtle.pos())
 
             first = not first
@@ -167,7 +166,7 @@ def pvpGraphicalGame(over, first):
             # Wait for a click to happen
             while turtx == turtle.xcor() and turty == turtle.ycor():
                 turtle.onclick(turtle.goto)
-                # graphicalPlace(turtle.xcor(), turtle.ycor(), boardSize, turtle.screensize())
+                # graphicalPlace(turtle.xcor(), turtle.ycor(), game.boardSize, turtle.screensize())
                 print(turtle.pos())
 
             first = not first
@@ -191,79 +190,79 @@ def pvpGraphicalGame(over, first):
 #     #         first = not first
 #
 #     #     # Terminal board representation
-#     #     for row in range(boardSize):
-#     #         print(logicBoard[row])
+#     #     for row in range(game.boardSize):
+#     #         print(game.logicBoard[row])
 #     #
 #     #     over = terminalWin(countX, countO, plays)
 
 
-# TODO: write tests (have to set boardSize)
 def pvpTerminalGame(over, first):
     plays = 0
     while not over:
         count = 1
-        piece = classes.PieceX()
 
         # Tie Game
-        if plays == boardSize ** 2:
+        if plays == game.boardSize ** 2:
             print("It's a draw!")
             over = True
 
-        # O plays: X is default case
-        elif first == 1:
-            piece = classes.PieceO()
+        # X plays
+        piece = classes.Piece('X')
+        # O plays
+        if first == 1:
+            piece = classes.Piece('O')
 
         plays += 1
 
         # per turn, wherever coordinates are, place a piece on the board
-        print(f"{piece.val()}'s turn! Enter coordinates between 1,1 and {boardSize},{boardSize}:")
+        print(f"{piece.val()}'s turn! Enter coordinates between 1,1 and {game.boardSize},{game.boardSize}:")
         if terminalPlace(piece):
             break
 
         # Win Condition Checking:
         # \ diagonal check: if top left corner is piece.val() then check
-        if logicBoard[0][0] == piece.val():
-            for row_col in range(1, boardSize):
-                if logicBoard[row_col][row_col] == piece.val():
+        if game.logicBoard[0][0] == piece.val():
+            for row_col in range(1, game.boardSize):
+                if game.logicBoard[row_col][row_col] == piece.val():
                     count += 1
         # determine if win has occurred
-        if count >= boardSize:
+        if count >= game.boardSize:
             over = True
         else:
             count = 1
 
         # / diagonal check: if top right corner is piece.val() then check
-        if logicBoard[0][boardSize - 1] == piece.val():
-            col = boardSize - 2
-            for row in range(1, boardSize):
-                if logicBoard[row][col] == piece.val():
+        if game.logicBoard[0][game.boardSize - 1] == piece.val():
+            col = game.boardSize - 2
+            for row in range(1, game.boardSize):
+                if game.logicBoard[row][col] == piece.val():
                     count += 1
                 col -= 1
         # determine if win has occurred
-        if count >= boardSize:
+        if count >= game.boardSize:
             over = True
         else:
             count = 1
 
-        for start in range(boardSize):
+        for start in range(game.boardSize):
             # - vertical check: if top row is piece.val() then check
-            if logicBoard[0][start] == piece.val():
-                for row in range(1, boardSize):
-                    if logicBoard[row][start] == piece.val():
+            if game.logicBoard[0][start] == piece.val():
+                for row in range(1, game.boardSize):
+                    if game.logicBoard[row][start] == piece.val():
                         count += 1
             # determine if win has occurred
-            if count >= boardSize:
+            if count >= game.boardSize:
                 over = True
             else:
                 count = 1
 
             # | horizontal check: if start column is piece.val() then check
-            if logicBoard[start][0] == piece.val():
-                for col in range(1, boardSize):
-                    if logicBoard[start][col] == piece.val():
+            if game.logicBoard[start][0] == piece.val():
+                for col in range(1, game.boardSize):
+                    if game.logicBoard[start][col] == piece.val():
                         count += 1
             # determine if win has occurred
-            if count >= boardSize:
+            if count >= game.boardSize:
                 over = True
             else:
                 count = 1
@@ -277,47 +276,37 @@ def pvpTerminalGame(over, first):
 
 if __name__ == '__main__':
     # setup
-    whoGoesFirst = randint(0, 1)
-    gameOver = False
-
-    boardSize = getBoardSize()
-    logicBoard = initBoard(boardSize)
-
-    print("Game Formatting Selection:")
-    formatting = getDisplayFormat()
-
-    print("Game Mode Selection:")
-    mode = getGameMode()
+    game = classes.GameObject()
 
     # Gameplay loops
     # TODO: make game wait for a click to happen
-    if formatting == 1:
+    if game.formatting == 1:
         terminalRefresh()
         turtle.screensize(600, 450)
-        drawBoard(turtle, boardSize, turtle.screensize())
+        drawBoard(turtle, game.boardSize, turtle.screensize())
 
         # Computer game loop, turtle
-        if mode == 1:
-            print(f"Playing against the computer.\nPlayer {whoGoesFirst + 1} goes first!")
-            # computerGraphicalGame(gameOver, whoGoesFirst)
+        if game.mode == 1:
+            print(f"Playing against the computer.\nPlayer {game.whoGoesFirst + 1} goes first!")
+            # computerGraphicalGame(game.gameOver, game.whoGoesFirst)
 
         # PvP game loop, turtle
-        elif mode == 2:
-            print(f"Playing against someone locally.\nPlayer {whoGoesFirst + 1} goes first!")
-            pvpGraphicalGame(gameOver, whoGoesFirst)
+        elif game.mode == 2:
+            print(f"Playing against someone locally.\nPlayer {game.whoGoesFirst + 1} goes first!")
+            pvpGraphicalGame(game.gameOver, game.whoGoesFirst)
 
-    elif formatting == 2:
+    elif game.formatting == 2:
         terminalRefresh()
         # Computer game loop, terminal
-        if mode == 1:
-            print(f"Playing against the computer.\nPlayer {whoGoesFirst + 1} goes first!")
-            # computerTerminalGame(gameOver, whoGoesFirst)
+        if game.mode == 1:
+            print(f"Playing against the computer.\nPlayer {game.whoGoesFirst + 1} goes first!")
+            # computerTerminalGame(game.gameOver, game.whoGoesFirst)
 
         # PvP game loop, terminal
-        elif mode == 2:
-            print(f"Playing against someone locally.\nPlayer {whoGoesFirst + 1} goes first!")
-            pvpTerminalGame(gameOver, whoGoesFirst)
+        elif game.mode == 2:
+            print(f"Playing against someone locally.\nPlayer {game.whoGoesFirst + 1} goes first!")
+            pvpTerminalGame(game.gameOver, game.whoGoesFirst)
 
     # TODO: make quitting actually shut everything down
-    if formatting == 1:
+    if game.formatting == 1:
         turtle.done()
